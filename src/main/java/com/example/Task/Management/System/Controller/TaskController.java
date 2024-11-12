@@ -6,10 +6,12 @@ import com.example.Task.Management.System.Dto.Task.UpdateTaskDTO;
 import com.example.Task.Management.System.Service.TaskService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -46,6 +48,21 @@ public class TaskController {
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/{id}/status")
+    public TaskDto changeTaskStatus(@PathVariable Long id, @RequestParam String newStatus) {
+        return taskService.changeStatus(id, newStatus);
+    }
+
+    @PutMapping("/{id}/priority")
+    public TaskDto changeTaskPriority(@PathVariable Long id, @RequestParam String newPriority) {
+        return taskService.changePriority(id, newPriority);
+    }
+
+    @GetMapping("/tasks/before")
+    public List<TaskDto> getTasksBeforeDueDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
+        return taskService.getTasksDueDate(date);
     }
 
 }

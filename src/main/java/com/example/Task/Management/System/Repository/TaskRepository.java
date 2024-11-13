@@ -11,8 +11,9 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
     List<Task> findByDueDateBefore(LocalDateTime date);
+
     List<Task> findAllByUser(User user);
 
-    List<Task> findByDueDateBeforeAndUser(LocalDateTime date, User user);
+    List<Task> findAllByUserAndDueDateBefore(User user, LocalDateTime date);
 
 }

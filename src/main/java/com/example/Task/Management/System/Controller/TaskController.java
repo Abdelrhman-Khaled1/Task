@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,7 @@ public class TaskController {
 
 
     @GetMapping
-    public List<TaskDto> getAllTasks() {
+    public List<TaskDto> getMyTasks() {
         return taskService.getAllTaskForLoggedInUser();
     }
 
@@ -61,10 +62,11 @@ public class TaskController {
     }
 
     @GetMapping("/before")
-    public List<TaskDto> getTasksBeforeDueDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
+    public List<TaskDto> getMyTasksBeforeDueDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
         return taskService.getTasksDueDate(date);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/all")
     public List<TaskDto> adminGetAllTasks(){
         return taskService.adminGetAllTasks();

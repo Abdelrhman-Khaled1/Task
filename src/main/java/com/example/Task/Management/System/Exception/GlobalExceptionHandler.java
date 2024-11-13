@@ -36,9 +36,23 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<HashMap<String, Object>> handleBookNotFoundException(TaskNotFoundException ex) {
+    public ResponseEntity<HashMap<String, Object>> handleTaskNotFoundException(TaskNotFoundException ex) {
         logger.error("Error: {}", ex.getMessage());
         HashMap<String, Object> response = createErrorResponse(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<HashMap<String, Object>> handleUserNotFoundException(UserNotFoundException ex) {
+        logger.error("Error: {}", ex.getMessage());
+        HashMap<String, Object> response = createErrorResponse(HttpStatus.NOT_FOUND, "Not Found", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UserMisMatchException.class)
+    public ResponseEntity<HashMap<String, Object>> handleUserMisMatchException(UserMisMatchException ex) {
+        logger.error("Error: {}", ex.getMessage());
+        HashMap<String, Object> response = createErrorResponse(HttpStatus.FORBIDDEN, "User MisMatch", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 

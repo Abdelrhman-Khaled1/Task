@@ -1,5 +1,6 @@
 package com.example.Task.Management.System.Entity.Task;
 
+import com.example.Task.Management.System.Entity.User.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,5 +34,9 @@ public class Task {
     private Priority priority;
 
     private LocalDateTime dueDate;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
 }

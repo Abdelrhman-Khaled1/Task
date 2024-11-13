@@ -6,10 +6,13 @@ import com.example.Task.Management.System.Dto.Task.UpdateTaskDTO;
 import com.example.Task.Management.System.Entity.Task.Priority;
 import com.example.Task.Management.System.Entity.Task.Status;
 import com.example.Task.Management.System.Entity.Task.Task;
+import com.example.Task.Management.System.Entity.User.User;
 import com.example.Task.Management.System.Exception.TaskNotFoundException;
+import com.example.Task.Management.System.Exception.UserMisMatchException;
 import com.example.Task.Management.System.Mapper.TaskMapper;
 import com.example.Task.Management.System.Repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,19 +24,30 @@ import java.util.List;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final AuthenticationService authenticationService;
+    private final UserService userService;
 
 
     public TaskDto saveTask(AddTaskDTO taskRequestDTO) {
         Task task = taskMapper.toEntity(taskRequestDTO);
+
+        UserDetails loggedInUser = authenticationService.getCurrentUser().orElseThrow(() -> new IllegalArgumentException("User Not Found"));
+        User user = userService.findByEmail(loggedInUser.getUsername());
+
+        task.setUser(user);
+
         Task savedTask = taskRepository.save(task);
         return taskMapper.toDto(savedTask);
     }
 
-    public List<TaskDto> getAllTasks() {
-        return taskMapper.toDtos(taskRepository.findAll());
+    public List<TaskDto> getAllTaskForLoggedInUser() {
+        UserDetails loggedInUser = authenticationService.getCurrentUser().orElseThrow(() -> new IllegalArgumentException("User Not Found"));
+        User user = userService.findByEmail(loggedInUser.getUsername());
+
+        return taskMapper.toDtos(findTasksByUser(user));
     }
 
-    public TaskDto getTaskById(Long id) {
+    public TaskDto getTaskById(Long id) {//TODO:: not task of logged-in user
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID must be greater than 0");
         }
@@ -47,13 +61,24 @@ public class TaskService {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException("ID must be greater than 0");
         }
-        if (taskRepository.findById(id).isPresent()) {
-            Task updatedTask = taskMapper.toEntity(updateTaskDTO);
-            updatedTask.setId(id);
-            Task patron = taskRepository.save(updatedTask);
-            return taskMapper.toDto(patron);
+
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+
+        UserDetails loggedInUser = authenticationService.getCurrentUser().orElseThrow(() -> new IllegalArgumentException("User Not Found"));
+        User user = userService.findByEmail(loggedInUser.getUsername());
+
+        // Check if the Logged-In user is the owner of the task
+        if (!task.getUser().equals(user)) {
+            throw new UserMisMatchException("Invalid Logged in User");
         }
-        throw new TaskNotFoundException(id);
+
+        Task updatedTask = taskMapper.toEntity(updateTaskDTO);
+        updatedTask.setId(id);
+        updatedTask.setUser(user);
+        Task savedTask = taskRepository.save(updatedTask);
+        return taskMapper.toDto(savedTask);
+
     }
 
     public void deleteTask(Long id) {
@@ -62,9 +87,16 @@ public class TaskService {
             throw new IllegalArgumentException("ID must be greater than 0");
         }
 
-        if (!taskRepository.existsById(id)) {
-            throw new TaskNotFoundException(id);
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException(id));
+
+        UserDetails loggedInUser = authenticationService.getCurrentUser().orElseThrow(() -> new IllegalArgumentException("User Not Found"));
+        User user = userService.findByEmail(loggedInUser.getUsername());
+
+        if (!task.getUser().equals(user)) {
+            throw new UserMisMatchException("Invalid Logged in User");
         }
+
         taskRepository.deleteById(id);
     }
 
@@ -92,5 +124,13 @@ public class TaskService {
 
     public List<TaskDto> getTasksDueDate(LocalDateTime date) {
         return taskMapper.toDtos(taskRepository.findByDueDateBefore(date));
+    }
+
+    private List<Task> findTasksByUser(User user) {
+        return taskRepository.findAllByUser(user);
+    }
+
+    public List<TaskDto> adminGetAllTasks() {
+        return taskMapper.toDtos(taskRepository.findAll());
     }
 }

@@ -23,7 +23,7 @@ public class TaskController {
 
     @GetMapping
     public List<TaskDto> getAllTasks() {
-        return taskService.getAllTasks();
+        return taskService.getAllTaskForLoggedInUser();
     }
 
     @GetMapping("/{id}")
@@ -39,7 +39,7 @@ public class TaskController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TaskDto> updatePatron(@PathVariable Long id, @Valid @RequestBody UpdateTaskDTO updateTaskDto) {
+    public ResponseEntity<TaskDto> updateTask(@PathVariable Long id, @Valid @RequestBody UpdateTaskDTO updateTaskDto) {
         TaskDto updated = taskService.updateTask(id, updateTaskDto);
         return ResponseEntity.status(HttpStatus.OK).body(updated);
     }
@@ -60,9 +60,14 @@ public class TaskController {
         return taskService.changePriority(id, newPriority);
     }
 
-    @GetMapping("/tasks/before")
+    @GetMapping("/before")
     public List<TaskDto> getTasksBeforeDueDate(@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date) {
         return taskService.getTasksDueDate(date);
+    }
+
+    @GetMapping("/admin/all")
+    public List<TaskDto> adminGetAllTasks(){
+        return taskService.adminGetAllTasks();
     }
 
 }

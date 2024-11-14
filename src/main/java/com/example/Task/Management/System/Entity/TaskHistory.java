@@ -1,32 +1,30 @@
-package com.example.Task.Management.System.Entity.Task;
+package com.example.Task.Management.System.Entity;
 
-import com.example.Task.Management.System.Entity.User.User;
-import com.example.Task.Management.System.Listener.TaskListener;
+import com.example.Task.Management.System.Entity.Task.Priority;
+import com.example.Task.Management.System.Entity.Task.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "tasks")
-@EntityListeners(TaskListener.class)
-@Builder
+@Table(name = "task_history")
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class Task {
+@NoArgsConstructor
+public class TaskHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    private Long taskId;
+
     private String title;
 
-    @Column(nullable = false)
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -37,8 +35,5 @@ public class Task {
 
     private LocalDateTime dueDate;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
+    private LocalDateTime changeTime;  // Timestamp of this history record
 }

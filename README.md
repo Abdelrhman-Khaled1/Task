@@ -89,3 +89,7 @@ Users: Stores user data and roles. <br/>
 Tasks: Holds all tasks with title, description, status, priority, due date, and user ownership. <br/>
 Task History: Logs all task changes with a timestamp and the status. <br/>
 Notifications: Tracks all sent notifications for record-keeping. <br/>
+
+# Postman for testing 
+
+[Task Management System.postman_collection.json](https://github.com/user-attachments/files/17745038/Task.Management.System.postman_collection.json)

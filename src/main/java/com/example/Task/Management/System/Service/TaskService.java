@@ -37,7 +37,7 @@ public class TaskService {
     private final UserService userService;
 
 
-    private User getLoggedInUser() {
+    protected User getLoggedInUser() {
         UserDetails loggedInUser = authenticationService.getCurrentUser().orElseThrow(() -> new IllegalArgumentException("User Not Found"));
         User user = userService.findByEmail(loggedInUser.getUsername());
         return user;

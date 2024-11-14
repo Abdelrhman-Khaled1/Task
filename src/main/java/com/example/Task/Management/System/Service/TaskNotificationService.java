@@ -28,6 +28,7 @@ public class TaskNotificationService {
         tasksDueSoon.forEach(task -> {
             // Sending Email
             emailService.sendDueSoonEmail(task.getUser().getEmail(), task);
+
         });
     }
 }

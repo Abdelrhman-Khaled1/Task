@@ -1,7 +1,10 @@
 package com.example.Task.Management.System.Controller;
 
+import com.example.Task.Management.System.Dto.Search.TaskSearchDTOUser;
 import com.example.Task.Management.System.Dto.Task.AddTaskDTO;
 import com.example.Task.Management.System.Dto.Task.TaskDto;
+import com.example.Task.Management.System.Dto.Search.TaskSearchDTOAdmin;
+import com.example.Task.Management.System.Dto.Task.TaskSearchResultDto;
 import com.example.Task.Management.System.Dto.Task.UpdateTaskDTO;
 import com.example.Task.Management.System.Service.TaskService;
 import jakarta.validation.Valid;
@@ -68,8 +71,20 @@ public class TaskController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/all")
-    public List<TaskDto> adminGetAllTasks(){
+    public List<TaskDto> adminGetAllTasks() {
         return taskService.adminGetAllTasks();
+    }
+
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin/search")
+    public ResponseEntity<List<TaskSearchResultDto>> adminSearch(@RequestBody TaskSearchDTOAdmin searchDTO) {
+        return new ResponseEntity<>(taskService.adminSearchTasks(searchDTO), HttpStatus.OK);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<TaskDto>> userSearch(@RequestBody TaskSearchDTOUser searchDTO) {
+        return new ResponseEntity<>(taskService.userSearchTasks(searchDTO), HttpStatus.OK);
     }
 
 }

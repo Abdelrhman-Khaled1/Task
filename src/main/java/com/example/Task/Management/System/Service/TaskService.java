@@ -1,7 +1,10 @@
 package com.example.Task.Management.System.Service;
 
+import com.example.Task.Management.System.Dto.Search.TaskSearchDTOUser;
 import com.example.Task.Management.System.Dto.Task.AddTaskDTO;
 import com.example.Task.Management.System.Dto.Task.TaskDto;
+import com.example.Task.Management.System.Dto.Search.TaskSearchDTOAdmin;
+import com.example.Task.Management.System.Dto.Task.TaskSearchResultDto;
 import com.example.Task.Management.System.Dto.Task.UpdateTaskDTO;
 import com.example.Task.Management.System.Entity.Task.Priority;
 import com.example.Task.Management.System.Entity.Task.Status;
@@ -11,7 +14,9 @@ import com.example.Task.Management.System.Exception.TaskNotFoundException;
 import com.example.Task.Management.System.Exception.UserMisMatchException;
 import com.example.Task.Management.System.Mapper.TaskMapper;
 import com.example.Task.Management.System.Repository.TaskRepository;
+import com.example.Task.Management.System.Repository.TaskSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -143,4 +148,40 @@ public class TaskService {
     public List<TaskDto> adminGetAllTasks() {
         return taskMapper.toDtos(taskRepository.findAll());
     }
+
+    public List<TaskDto> userSearchTasks(TaskSearchDTOUser taskSearchDTO) {
+        Specification<Task> spec = Specification.where(TaskSpecification.hasUser(getLoggedInUser()))
+                .and(TaskSpecification.hasTitleContaining(taskSearchDTO.getTitle()))
+                .and(TaskSpecification.hasDescriptionContaining(taskSearchDTO.getDescription()))
+                .and(TaskSpecification.hasStatus(taskSearchDTO.getStatus()))
+                .and(TaskSpecification.hasPriority(taskSearchDTO.getPriority()))
+                .and(TaskSpecification.hasDueDateBetween(taskSearchDTO.getStartDate(), taskSearchDTO.getEndDate()));
+
+        List<Task> taskList = taskRepository.findAll(spec);
+        List<TaskDto> taskDtos = taskMapper.toDtos(taskList);
+        return taskDtos;
+    }
+
+    public List<TaskSearchResultDto> adminSearchTasks(TaskSearchDTOAdmin taskSearchDTO) {
+        Specification<Task> spec = Specification.where(null); // Start with a base Specification of `null`
+
+        // If userId is provided, add user filtering
+        if (taskSearchDTO.getUserId() != null) {
+            User user = userService.findById(taskSearchDTO.getUserId());
+            spec = spec.and(TaskSpecification.hasUser(user));
+        }
+        spec = spec.and(TaskSpecification.hasTitleContaining(taskSearchDTO.getTitle()))
+                .and(TaskSpecification.hasDescriptionContaining(taskSearchDTO.getDescription()))
+                .and(TaskSpecification.hasStatus(taskSearchDTO.getStatus()))
+                .and(TaskSpecification.hasPriority(taskSearchDTO.getPriority()))
+                .and(TaskSpecification.hasDueDateBetween(taskSearchDTO.getStartDate(), taskSearchDTO.getEndDate()));
+
+        List<Task> taskList = taskRepository.findAll(spec);
+        List<TaskSearchResultDto> resultDto = taskList.stream()
+                .map(TaskSearchResultDto::from).toList();
+
+        return resultDto;
+    }
+
+
 }

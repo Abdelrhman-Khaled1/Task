@@ -1,4 +1,4 @@
-package com.example.Task.Management.System.Dto.Task;
+package com.example.Task.Management.System.Dto.Search;
 
 import com.example.Task.Management.System.Entity.Task.Priority;
 import com.example.Task.Management.System.Entity.Task.Status;

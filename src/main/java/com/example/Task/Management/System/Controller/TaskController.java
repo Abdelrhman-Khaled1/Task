@@ -1,10 +1,11 @@
 package com.example.Task.Management.System.Controller;
 
+import com.example.Task.Management.System.Dto.Page.PageDto;
 import com.example.Task.Management.System.Dto.Search.TaskSearchDTOUser;
 import com.example.Task.Management.System.Dto.Task.AddTaskDTO;
 import com.example.Task.Management.System.Dto.Task.TaskDto;
 import com.example.Task.Management.System.Dto.Search.TaskSearchDTOAdmin;
-import com.example.Task.Management.System.Dto.Task.TaskSearchResultDto;
+import com.example.Task.Management.System.Dto.Search.TaskSearchResultDto;
 import com.example.Task.Management.System.Dto.Task.UpdateTaskDTO;
 import com.example.Task.Management.System.Service.TaskService;
 import jakarta.validation.Valid;
@@ -71,9 +72,11 @@ public class TaskController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin/all")
-    public List<TaskDto> adminGetAllTasks() {
-        return taskService.adminGetAllTasks();
+    public ResponseEntity<PageDto<TaskDto>> adminGetAllTasks(@RequestParam int page, @RequestParam int size) {
+        PageDto<TaskDto> tasks = taskService.adminGetAllTasks(page, size);
+        return ResponseEntity.ok(tasks);
     }
+
 
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -1,10 +1,11 @@
 package com.example.Task.Management.System.Service;
 
+import com.example.Task.Management.System.Dto.Page.PageDto;
 import com.example.Task.Management.System.Dto.Search.TaskSearchDTOUser;
 import com.example.Task.Management.System.Dto.Task.AddTaskDTO;
 import com.example.Task.Management.System.Dto.Task.TaskDto;
 import com.example.Task.Management.System.Dto.Search.TaskSearchDTOAdmin;
-import com.example.Task.Management.System.Dto.Task.TaskSearchResultDto;
+import com.example.Task.Management.System.Dto.Search.TaskSearchResultDto;
 import com.example.Task.Management.System.Dto.Task.UpdateTaskDTO;
 import com.example.Task.Management.System.Entity.Task.Priority;
 import com.example.Task.Management.System.Entity.Task.Status;
@@ -16,6 +17,9 @@ import com.example.Task.Management.System.Mapper.TaskMapper;
 import com.example.Task.Management.System.Repository.TaskRepository;
 import com.example.Task.Management.System.Repository.TaskSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -145,8 +149,19 @@ public class TaskService {
         return taskRepository.findAllByUser(user);
     }
 
-    public List<TaskDto> adminGetAllTasks() {
-        return taskMapper.toDtos(taskRepository.findAll());
+    public PageDto<TaskDto> adminGetAllTasks(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Task> taskPage = taskRepository.findAll(pageable);
+
+        List<TaskDto> taskDtos = taskMapper.toDtos(taskPage.getContent());
+
+        return new PageDto<>(
+                taskDtos,
+                taskPage.getTotalPages(),
+                taskPage.getTotalElements(),
+                taskPage.getSize(),
+                taskPage.getNumber()
+        );
     }
 
     public List<TaskDto> userSearchTasks(TaskSearchDTOUser taskSearchDTO) {

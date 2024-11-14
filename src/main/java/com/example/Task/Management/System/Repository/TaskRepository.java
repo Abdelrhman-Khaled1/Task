@@ -17,4 +17,7 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
 
     List<Task> findAllByUserAndDueDateBefore(User user, LocalDateTime date);
 
+    List<Task> findByDueDateBetween(LocalDateTime start, LocalDateTime end);
+
+
 }

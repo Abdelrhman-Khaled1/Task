@@ -11,12 +11,24 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
-    List<Task> findByDueDateBefore(LocalDateTime date);
 
+    /*
+    SELECT * FROM tasks
+    WHERE user_id = :userId;
+    */
     List<Task> findAllByUser(User user);
 
+    /*
+    SELECT * FROM tasks
+    WHERE user_id = :userId
+    AND due_date < :date;
+    */
     List<Task> findAllByUserAndDueDateBefore(User user, LocalDateTime date);
 
+    /*
+    SELECT * FROM tasks
+    WHERE due_date BETWEEN :start AND :end;
+    */
     List<Task> findByDueDateBetween(LocalDateTime start, LocalDateTime end);
 
 

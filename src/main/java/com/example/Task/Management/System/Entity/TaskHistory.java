@@ -36,4 +36,18 @@ public class TaskHistory {
     private LocalDateTime dueDate;
 
     private LocalDateTime changeTime;  // Timestamp of this history record
+
+    /*
+    CREATE TABLE task_history (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    task_id BIGINT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    status VARCHAR(50),
+    priority VARCHAR(50),
+    due_date TIMESTAMP,
+    change_time TIMESTAMP,
+    FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+    );
+    */
 }

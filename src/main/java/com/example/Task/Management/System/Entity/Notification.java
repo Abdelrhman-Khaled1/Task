@@ -34,5 +34,15 @@ public class Notification {
         this.message = message;
         this.sentAt = sentAt;
     }
+
+    /*
+    CREATE TABLE notification (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    recipient_email VARCHAR(255) NOT NULL,
+    subject VARCHAR(255),
+    message TEXT,
+    sent_at TIMESTAMP
+    );
+    */
 }
 
